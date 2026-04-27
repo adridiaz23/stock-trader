@@ -10,6 +10,7 @@ and analyze financial assets in real time.
 - Python 3.10+
 - [yfinance](https://github.com/ranaroussi/yfinance) — market data
 - pandas — data manipulation
+- [Plotly](https://plotly.com/python/) — interactive charts
 
 ## Setup
 
