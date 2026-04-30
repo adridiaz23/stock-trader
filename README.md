@@ -25,7 +25,17 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-python main.py
+# Basic usage
+python main.py AAPL
+
+# Custom time period
+python main.py MSFT --period 6mo
+
+# Specific chart type
+python main.py TSLA --period 1y --chart candlestick
+
+# Available options
+python main.py --help
 ```
 
 ## Project Status
