@@ -22,6 +22,14 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Features
+
+- 📈 Real-time stock price and company info
+- 📅 Historical OHLCV data with configurable time period
+- 📊 Interactive charts: line, candlestick, and moving averages
+- 🧮 Financial metrics: period high/low, average price, total return
+- 📉 Technical indicators: SMA 20, SMA 50, daily returns
+
 ## Usage
 
 ```bash
