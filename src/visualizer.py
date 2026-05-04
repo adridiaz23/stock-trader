@@ -85,3 +85,57 @@ def plot_candlestick(df: pd.DataFrame, ticker: str) -> None:
     )
 
     fig.show()
+
+
+def plot_with_moving_averages(df: pd.DataFrame, ticker: str) -> None:
+    """
+    Generate a chart showing price history with SMA_20 and SMA_50 overlaid.
+
+    Moving averages on a price chart is one of the most classic
+    visualizations in technical analysis.
+
+    Args:
+        df: DataFrame with SMA_20 and SMA_50 columns (from analyzer.py)
+        ticker: Stock symbol, used for the chart title
+    """
+
+    fig = go.Figure()
+
+    # Main price line
+    fig.add_trace(go.Scatter(
+        x=df.index,
+        y=df["Close"],
+        mode="lines",
+        name="Close Price",
+        line=dict(color="#00b4d8", width=2)
+    ))
+
+    # SMA 20 — short term trend (only plot if we have enough data)
+    if "SMA_20" in df.columns:
+        fig.add_trace(go.Scatter(
+            x=df.index,
+            y=df["SMA_20"],
+            mode="lines",
+            name="SMA 20",
+            line=dict(color="#f4a261", width=1.5, dash="dash")
+        ))
+
+    # SMA 50 — long term trend
+    if "SMA_50" in df.columns:
+        fig.add_trace(go.Scatter(
+            x=df.index,
+            y=df["SMA_50"],
+            mode="lines",
+            name="SMA 50",
+            line=dict(color="#e76f51", width=1.5, dash="dot")
+        ))
+
+    fig.update_layout(
+        title=f"{ticker} — Price with Moving Averages",
+        xaxis_title="Date",
+        yaxis_title="Price (USD)",
+        template="plotly_dark",
+        hovermode="x unified",
+    )
+
+    fig.show()
