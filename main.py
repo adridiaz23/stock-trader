@@ -2,62 +2,59 @@
 main.py - Entry point for the Stock Tracker application.
 """
 
-# argparse is a built-in Python library for handling command-line arguments
-# No need to install it — it comes with Python
 import argparse
 
 from src.fetcher import get_stock_info, get_historical_data
-from src.visualizer import plot_price_history, plot_candlestick
+from src.visualizer import plot_price_history, plot_candlestick, plot_with_moving_averages
+
+# Import our new analyzer functions
+from src.analyzer import get_summary, add_moving_averages, add_daily_returns
 
 
 def parse_args():
-    """
-    Define and parse command-line arguments.
-
-    This keeps argument logic separate from the main business logic,
-    which is cleaner and easier to test.
-    """
-
-    # ArgumentParser is the main object that manages our CLI arguments
     parser = argparse.ArgumentParser(
         description="Stock Tracker — fetch and visualize stock market data."
     )
-
-    # First argument: the stock ticker (required)
-    # It's positional — the user just writes it after the script name
     parser.add_argument(
         "ticker",
         type=str,
         help="Stock ticker symbol (e.g. AAPL, MSFT, TSLA)"
     )
-
-    # Second argument: the time period (optional, defaults to 3mo)
-    # It's optional — the user can omit it and get the default
     parser.add_argument(
         "--period",
         type=str,
         default="3mo",
-        choices=["1mo", "3mo", "6mo", "1y", "2y"],  # only valid values allowed
+        choices=["1mo", "3mo", "6mo", "1y", "2y"],
         help="Historical data period (default: 3mo)"
     )
-
-    # Third argument: which chart to show (optional, defaults to both)
     parser.add_argument(
         "--chart",
         type=str,
         default="both",
-        choices=["line", "candlestick", "both"],
+        choices=["line", "candlestick", "sma", "both"],
         help="Chart type to display (default: both)"
     )
-
     return parser.parse_args()
 
 
-def main():
-    # Parse the arguments the user passed in the terminal
-    args = parse_args()
+def print_summary(summary: dict) -> None:
+    """Print a formatted summary of financial metrics."""
 
-    # Now ticker comes from the user, not hardcoded
+    # "+" before a number adds a + sign for positive values
+    # This is standard in financial displays
+    return_sign = "+" if summary["total_return"] > 0 else ""
+
+    print(f"\n📊 Period Summary")
+    print(f"{'─' * 30}")
+    print(f"Period High:    ${summary['period_high']}")
+    print(f"Period Low:     ${summary['period_low']}")
+    print(f"Average Price:  ${summary['avg_price']}")
+    print(f"Total Return:   {return_sign}{summary['total_return']}%")
+    print(f"{'─' * 30}")
+
+
+def main():
+    args = parse_args()
     ticker = args.ticker.upper()
 
     print(f"\n📈 Fetching data for {ticker}...\n")
@@ -69,13 +66,21 @@ def main():
     print(f"Current Price: {info['current_price']} {info['currency']}")
 
     # --- Historical data ---
-    # period also comes from the user now
     df = get_historical_data(ticker, period=args.period)
-    print(f"\nHistorical data (last 5 trading days):")
-    print(df[["Open", "Close", "Volume"]].tail())
+
+    # --- Analysis ---
+    # We enrich the DataFrame with calculated columns before displaying
+    df = add_moving_averages(df)
+    df = add_daily_returns(df)
+
+    # Print the financial summary
+    summary = get_summary(df, ticker)
+    print_summary(summary)
+
+    print(f"\nLast 5 trading days:")
+    print(df[["Close", "SMA_20", "Daily_Return"]].tail().round(2))
 
     # --- Charts ---
-    # We show only what the user asked for
     print("\n📊 Opening charts...")
 
     if args.chart in ("line", "both"):
@@ -83,6 +88,9 @@ def main():
 
     if args.chart in ("candlestick", "both"):
         plot_candlestick(df, ticker)
+
+    if args.chart in ("sma", "both"):
+        plot_with_moving_averages(df, ticker)
 
 
 if __name__ == "__main__":
