@@ -29,6 +29,7 @@ pip install -r requirements.txt
 - 📊 Interactive charts: line, candlestick, and moving averages
 - 🧮 Financial metrics: period high/low, average price, total return
 - 📉 Technical indicators: SMA 20, SMA 50, daily returns
+- 💾 Export data to CSV and generate text reports with --export
 
 ## Usage
 
