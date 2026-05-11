@@ -6,9 +6,10 @@ import argparse
 
 from src.fetcher import get_stock_info, get_historical_data
 from src.visualizer import plot_price_history, plot_candlestick, plot_with_moving_averages
-
-# Import our new analyzer functions
 from src.analyzer import get_summary, add_moving_averages, add_daily_returns
+
+# Import the new exporter functions
+from src.exporter import export_to_csv, export_report
 
 
 def parse_args():
@@ -34,14 +35,19 @@ def parse_args():
         choices=["line", "candlestick", "sma", "both"],
         help="Chart type to display (default: both)"
     )
+
+    # New optional flag — if the user passes --export, we save the files
+    # action="store_true" means it's a boolean flag, no value needed
+    parser.add_argument(
+        "--export",
+        action="store_true",
+        help="Export data to CSV and generate a text report"
+    )
     return parser.parse_args()
 
 
 def print_summary(summary: dict) -> None:
     """Print a formatted summary of financial metrics."""
-
-    # "+" before a number adds a + sign for positive values
-    # This is standard in financial displays
     return_sign = "+" if summary["total_return"] > 0 else ""
 
     print(f"\n📊 Period Summary")
@@ -69,16 +75,21 @@ def main():
     df = get_historical_data(ticker, period=args.period)
 
     # --- Analysis ---
-    # We enrich the DataFrame with calculated columns before displaying
     df = add_moving_averages(df)
     df = add_daily_returns(df)
 
-    # Print the financial summary
     summary = get_summary(df, ticker)
     print_summary(summary)
 
     print(f"\nLast 5 trading days:")
     print(df[["Close", "SMA_20", "Daily_Return"]].tail().round(2))
+
+    # --- Export (only if --export flag is passed) ---
+    if args.export:
+        csv_path = export_to_csv(df, ticker, args.period)
+        report_path = export_report(summary, ticker, args.period)
+        print(f"\n💾 Data exported to:   {csv_path}")
+        print(f"📄 Report saved to:    {report_path}")
 
     # --- Charts ---
     print("\n📊 Opening charts...")
