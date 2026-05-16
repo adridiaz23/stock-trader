@@ -139,3 +139,51 @@ def plot_with_moving_averages(df: pd.DataFrame, ticker: str) -> None:
     )
 
     fig.show()
+
+def plot_comparison(normalized_df: pd.DataFrame, tickers: list) -> None:
+    """
+    Generate a comparison chart for multiple tickers using normalized prices.
+
+    Each ticker starts at 100 so performance is directly comparable
+    regardless of absolute price differences.
+
+    Args:
+        normalized_df: DataFrame returned by get_normalized_prices()
+        tickers: List of ticker symbols, used for the legend
+    """
+
+    # A distinct color per ticker — these work well on dark background
+    colors = ["#00b4d8", "#f4a261", "#2ecc71", "#e74c3c", "#9b59b6"]
+
+    fig = go.Figure()
+
+    for i, ticker in enumerate(tickers):
+        # Use modulo so we cycle through colors if there are more than 5 tickers
+        color = colors[i % len(colors)]
+
+        fig.add_trace(go.Scatter(
+            x=normalized_df.index,
+            y=normalized_df[ticker],
+            mode="lines",
+            name=ticker,
+            line=dict(color=color, width=2)
+        ))
+
+    # Add a horizontal reference line at 100 (the starting point)
+    # This makes it easy to see which stocks are up or down
+    fig.add_hline(
+        y=100,
+        line_dash="dash",
+        line_color="gray",
+        opacity=0.5
+    )
+
+    fig.update_layout(
+        title="Stock Comparison — Normalized Performance (base 100)",
+        xaxis_title="Date",
+        yaxis_title="Normalized Price (base 100)",
+        template="plotly_dark",
+        hovermode="x unified",
+    )
+
+    fig.show()
