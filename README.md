@@ -26,7 +26,7 @@ pip install -r requirements.txt
 
 - 📈 Real-time stock price and company info
 - 📅 Historical OHLCV data with configurable time period
-- 📊 Interactive charts: line, candlestick, and moving averages
+- 📊 Interactive charts- 📊 Interactive charts: line, candlestick, moving averages, and multi-ticker comparison: line, candlestick, and moving averages
 - 🧮 Financial metrics: period high/low, average price, total return
 - 📉 Technical indicators: SMA 20, SMA 50, daily returns
 - 💾 Export data to CSV and generate text reports with --export
@@ -45,6 +45,12 @@ python main.py TSLA --period 1y --chart candlestick
 
 # Available options
 python main.py --help
+
+# Compare multiple tickers
+python main.py AAPL MSFT TSLA --period 1y
+
+# Comparison chart only
+python main.py AAPL MSFT --chart compare
 ```
 
 ## Project Status
