@@ -89,3 +89,28 @@ def add_daily_returns(df: pd.DataFrame) -> pd.DataFrame:
     df["Daily_Return"] = df["Close"].pct_change() * 100
 
     return df
+
+def get_normalized_prices(tickers_data: dict) -> pd.DataFrame:
+    """
+    Normalize closing prices to 100 at the start date for all tickers.
+
+    Normalization allows fair comparison between stocks with very different
+    price ranges (e.g. AAPL at $180 vs BRK.A at $500,000).
+    A value of 110 means the stock gained 10% from the start of the period.
+
+    Args:
+        tickers_data: Dictionary where keys are ticker symbols and
+                      values are DataFrames from get_historical_data()
+
+    Returns:
+        A single DataFrame with one normalized column per ticker.
+    """
+
+    normalized = pd.DataFrame()
+
+    for ticker, df in tickers_data.items():
+        # Divide every price by the first price and multiply by 100
+        # So all tickers start at 100 on day 1 — comparable from there
+        normalized[ticker] = (df["Close"] / df["Close"].iloc[0]) * 100
+
+    return normalized
