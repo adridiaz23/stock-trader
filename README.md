@@ -52,6 +52,22 @@ python main.py AAPL MSFT TSLA --period 1y
 # Comparison chart only
 python main.py AAPL MSFT --chart compare
 ```
+## Web Dashboard
+
+Run the interactive Streamlit dashboard:
+
+```bash
+streamlit run app.py
+```
+
+Opens automatically at `http://localhost:8501`
+
+Features:
+- Sidebar controls for ticker, period and chart type
+- Live metric cards with return indicators
+- Interactive Plotly charts
+- Collapsible raw data table
+- Multi-ticker comparison chart
 
 ## Project Status
 🚧 In active development — see commits for progress.
